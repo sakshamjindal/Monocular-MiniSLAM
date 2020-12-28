@@ -1,20 +1,22 @@
 import cv2
 import numpy as np
 
+from .geocom.features import featureTracking
 
 KMIN_NUM_FEATURE = 1500
 
-class VisuaOdometry():
+class VisualOdometry():
    
     def __init__(self, camera_intrinsics, ground_pose,):
         
-        self.K=camera_instrinsics
+        self.K=camera_intrinsics
         self.ground_pose=ground_pose
         self.feature_tracker=featureTracking
         self.detector=cv2.FastFeatureDetector_create(threshold=25, nonmaxSuppression=True)
         self.cur_R=None
         self.cur_t=None
         self.prev_frame=None
+        self.trueX, self.trueY, self.trueZ = 0, 0, 0
         
     def getAbsoluteScale(self, frame_id):
         """
@@ -36,20 +38,20 @@ class VisuaOdometry():
         
         if stage==0:
             #process first frame
-            self.points_ref=self.detector.detect(curent_frame)
+            self.points_ref=self.detector.detect(current_frame)
             self.points_ref=np.array([x.pt for x in self.points_ref])
         elif stage==1:
             #process second frame
-            self.points_ref, points_cur = self.feature_tracker(self.prev_frame, current_frame, self.px_ref)
-            E, mask = cv2.findEssentialMat(points_cur, self.px_ref, self.K, method=cv2.RANSAC, prob=0.999, thresold=1.0)
-            _, self.cur_R, self.cur_t = cv2.recoverPose(E, points_cur, self.points_ref, self.K)
-            self.points_ref = self.points_cur
+            self.points_ref, points_cur = self.feature_tracker(self.prev_frame, current_frame, self.points_ref)
+            E, mask = cv2.findEssentialMat(points_cur, self.points_ref, self.K, method=cv2.RANSAC, prob=0.999, threshold=1.0)
+            _, self.cur_R, self.cur_t, mask = cv2.recoverPose(E, points_cur, self.points_ref, self.K)
+            self.points_ref = points_cur
         elif stage>1:
             #process subsequent frames after first 2 frames
-            self.points_ref, points_cur = self.feature_tracker(self.prev_frame, current_frame, self.px_ref)
-            E, mask = cv2.findEssentialMat(points_cur, self.px_ref, self.K, method=cv2.RANSAC, prob=0.999, thresold=1.0)
-            _, R, t = cv2.recoverPose(E, points_cur, self.points_ref, self.K)
-            absolute_scale = self.getAbsoluteScale(frame_id)
+            self.points_ref, points_cur = self.feature_tracker(self.prev_frame, current_frame, self.points_ref)
+            E, mask = cv2.findEssentialMat(points_cur, self.points_ref, self.K, method=cv2.RANSAC, prob=0.999, threshold=1.0)
+            _, R, t, mask = cv2.recoverPose(E, points_cur, self.points_ref, self.K)
+            absolute_scale = self.getAbsoluteScale(stage)
             if absolute_scale>0.1:
                 self.cur_t=self.cur_t + absolute_scale*R@t
                 self.cur_R=R@self.cur_R
@@ -58,6 +60,6 @@ class VisuaOdometry():
                 points_cur=np.array([x.pt for x in points_cur], dtype=np.float32)
             self.points_ref=points_cur
             
-        self.prev_frame=currrent_frame
+        self.prev_frame=current_frame
         
-        return
+        return self.cur_t
