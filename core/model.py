@@ -46,14 +46,14 @@ class VisualOdometry():
             E, mask = cv2.findEssentialMat(points_cur, self.points_ref, self.K, method=cv2.RANSAC, prob=0.999, threshold=1.0)
             _, self.cur_R, self.cur_t, mask = cv2.recoverPose(E, points_cur, self.points_ref, self.K)
             self.points_ref = points_cur
-        elif stage>1:
+        else:
             #process subsequent frames after first 2 frames
             self.points_ref, points_cur = self.feature_tracker(self.prev_frame, current_frame, self.points_ref)
             E, mask = cv2.findEssentialMat(points_cur, self.points_ref, self.K, method=cv2.RANSAC, prob=0.999, threshold=1.0)
             _, R, t, mask = cv2.recoverPose(E, points_cur, self.points_ref, self.K)
             absolute_scale = self.getAbsoluteScale(stage)
             if absolute_scale>0.1:
-                self.cur_t=self.cur_t + absolute_scale*R@t
+                self.cur_t=self.cur_t + absolute_scale*self.cur_R@t
                 self.cur_R=R@self.cur_R
             if(self.points_ref.shape[0]<KMIN_NUM_FEATURE):
                 points_cur=self.detector.detect(current_frame)

@@ -39,8 +39,9 @@ def main():
         else:
             x, y, z = 0.,  0., 0.
             
-        print(x,y,z)
-        draw_x, draw_y =int(x) + 290, int(z) + 290
+        ## Set ofset to remove the overlap
+        offset_x, offset_y = 5, 5
+        draw_x, draw_y =int(x) + 290 - offset_x, int(z) + 290 - offset_y
         true_x, true_y = int(model.trueX) + 290, int(model.trueZ) + 290
         
         draw_trajectory(blank_slate, index, x, y, z, draw_x, draw_y, true_x, true_y)
