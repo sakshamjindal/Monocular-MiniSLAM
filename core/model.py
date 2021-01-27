@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+from .optimizer import PoseGraph
 from .geocom.features import featureTracking
 
 KMIN_NUM_FEATURE = 1500
