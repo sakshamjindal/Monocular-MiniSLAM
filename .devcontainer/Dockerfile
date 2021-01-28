@@ -18,6 +18,8 @@ WORKDIR /
 # RUN apt-get install libglew-dev
 # RUN apt install ffmpeg libavcodec-dev libavutil-dev libavformat-dev libswscale-dev libavdevice-dev
 # RUN pip install PyOpenGL PyOpenGL_accelerate
+# RUN apt install graphviz
+# RUN apt-get install doxygen
 
 # RUN wget --quiet https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda.sh && \
 # 	bash ~/miniconda.sh -b -p /opt/conda && \
