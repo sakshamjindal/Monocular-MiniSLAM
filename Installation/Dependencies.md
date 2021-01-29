@@ -35,16 +35,19 @@ pangolin [fork](https://github.com/sakshamjindal/Pangolin-Python)
 
 ### Troubleshoot
 
-Error encountered during installation of g2o
+- Error encountered during installation of g2o
 
 ```
 rm /usr/bin/libGL.so
 sudo ln -s /usr/lib/x86_64-linux-gnu/libGL.so.1  /usr/bin/libGL.so
 ```
 
-Error encountered during installation of Panglolin
+- Error encountered during installation of Panglolin
 
 ```
 rm /usr/lib/x86_64-linux-gnu/libGL.so
 ln -s /usr/lib/x86_64-linux-gnu/mesa/libGL.so.1 /usr/lib/x86_64-linux-gnu/libGL.soD
 ```
+
+- Error while importing g2o
+Solution : https://stackoverflow.com/questions/52747902/python-import-successful-in-one-terminal-but-fails-in-another
