@@ -20,7 +20,7 @@ def main():
     
     # Get data params using the dataloader 
     dataset = KittiDataset(args.path)
-    camera_matrix = dataset.camera_intrinsics()
+    camera_matrix = dataset.intrinsic
     ground_truth_poses = dataset.ground_truth
     num_frames = len(dataset)
     
@@ -33,7 +33,7 @@ def main():
     # Iterate over the frames and update the rotation and translation vectors
     for index in range(num_frames):
 
-        frame, _ = dataset[index]
+        frame, _ , _ = dataset[index]
         model(index, frame)
         
         if index>2:

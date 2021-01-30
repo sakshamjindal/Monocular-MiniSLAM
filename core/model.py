@@ -5,8 +5,10 @@ from .optimizer import PoseGraph
 from .geocom.features import featureTracking
 
 from .utils import *
+import pdb
 
 KMIN_NUM_FEATURE = 1500
+optimize = False
 
 class VisualSLAM():
    
@@ -69,18 +71,16 @@ class VisualSLAM():
 
             self.points_ref = self.detector.detect(current_frame)
             self.points_ref = np.array([x.pt for x in self.points_ref])
-
+            self.prev_frame = current_frame        
+            return
+    
         elif stage == 1:
             """ process second frame """
             
             self.points_ref, points_cur = self.feature_tracker(self.prev_frame, current_frame, self.points_ref)
-            E, mask = cv2.findEssentialMat(points_cur, self.points_ref, self.K, method=cv2.RANSAC, prob=0.999, threshold=1.0)
-            _, self.cur_R, self.cur_t, mask = cv2.recoverPose(E, points_cur, self.points_ref, self.K)
+            E, _ = cv2.findEssentialMat(points_cur, self.points_ref, self.K, method=cv2.RANSAC, prob=0.999, threshold=1.0)
+            _, self.cur_R, self.cur_t, __ = cv2.recoverPose(E, points_cur, self.points_ref, self.K)
             self.points_ref = points_cur
-            
-            self.prev_t = self.cur_t
-            self.prev_R = self.prev_R
-            self.prev_Rt = convert_to_Rt(self.prev_R, self.prev_t)
         else:
             """ process subsequent frames after first 2 frames """
             
@@ -97,15 +97,15 @@ class VisualSLAM():
 
             self.points_ref = points_cur
         
-            self.cur_Rt = convert_to_Rt(cur_R, cur_t)
+            self.cur_Rt = convert_to_Rt(self.cur_R, self.cur_t)
             self.poses.append(self.cur_Rt)
             self.gt.append(self.ground_pose[stage-1])
 
-            self.run_optimizer()
-            self.calculate_errors()
-
+            if optimize:
+                self.run_optimizer()
+                self.calculate_errors()
 
         self.prev_t = self.cur_t
-        self.prev_R = self.prev_R
+        self.prev_R = self.cur_R
         self.prev_Rt = convert_to_Rt(self.prev_R, self.prev_t)        
         self.prev_frame = current_frame

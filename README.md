@@ -1,29 +1,18 @@
 # Monocular-Visual-Odometry
 
-
-
-
-
-## Troubleshoot
-
-Error encountered during installation of g2o
-
+To run the visual Odometry:
 ```
-rm /usr/bin/libGL.so
-sudo ln -s /usr/lib/x86_64-linux-gnu/libGL.so.1  /usr/bin/libGL.so
+python run_VO.py --path ../KITTI/KITTI_gray/dataset/sequences/00
 ```
-
-```
-rm /usr/lib/x86_64-linux-gnu/libGL.so
-ln -s /usr/lib/x86_64-linux-gnu/mesa/libGL.so.1 /usr/lib/x86_64-linux-gnu/libGL.soD
-```
+where `path` is the path to the KITTI dataset (directory structure of code and data to be updated)
 
 
 ## Task List
-[x] Build visual-odometry frontend with ORB descriptors and 2D-2D feature correspondences \
-[x] Build G2O and Pangolin (check Installation.md) on few tips on installation and troubleshooting guide \
-[] Integrate real-time pose-graph optimization backend using g2o
-[] Set up 3D plotter for visualisation of frames and point cloud
+- [x] Build visual-odometry frontend with ORB descriptors and 2D-2D feature correspondences 
+- [x] Build G2O and Pangolin (check [Installation.md](Installation/Installation.md)) on few tips on installation and troubleshooting guide 
+- [x] Check working of front end of the slam system
+- [ ] Integrate real-time pose-graph optimization backend using g2o
+- [ ] Set up 3D plotter for visualisation of frames and point cloud
 
 
 
