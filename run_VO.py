@@ -49,6 +49,11 @@ def main():
         draw_trajectory(blank_slate, index, x, y, z, draw_x, draw_y, true_x, true_y)
         cv2.imshow('Road facing camera', frame)
         cv2.waitKey(1)
+
+        if index>10:
+            break
     
+    model.pose_graph.optimize(100)
+
 if __name__ == "__main__":
     main()
