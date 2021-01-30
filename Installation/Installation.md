@@ -26,3 +26,5 @@ docker run -dit -P --name slam_box --net=host -e DISPLAY -v /tmp/.X11-unix -v ~/
 docker exec -it slam_box bash
 ```
 You will be able to see your working directory `~/mono-slam` inside `/home/` directory
+
+Some links that were helpful in step 3 were a [youtube video](https://www.youtube.com/watch?v=RDg6TRwiPtg&t=37s&ab_channel=PiotrekChmielowski)
