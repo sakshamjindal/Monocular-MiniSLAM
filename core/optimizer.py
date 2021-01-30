@@ -1,7 +1,7 @@
 import g2o
 import numpy as np
 
-class PoseGraph3D(object):
+class PoseGraph(object):
   nodes = []
   edges = []
   nodes_optimized = []

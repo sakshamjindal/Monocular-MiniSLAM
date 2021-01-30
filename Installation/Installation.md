@@ -22,6 +22,7 @@ docker build -t env_g2o_pangolin:latest .
 
 **Step 3. Mount the local directory and forward GUI components from inside the container**
 ```
+xhost +local:docker
 docker run -dit -P --name slam_box --net=host -e DISPLAY -v /tmp/.X11-unix -v ~/mono-slam:/home/slam env_g2o_pangolin:latest
 docker exec -it slam_box bash
 ```

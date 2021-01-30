@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import argparse
 
-from core.model import VisualOdometry
+from core.model import VisualSLAM
 from core.dataset import KittiDataset
 from core.utils import draw_trajectory
 
@@ -25,17 +25,19 @@ def main():
     num_frames = len(dataset)
     
     # Initialise the mono-VO model
-    model = VisualOdometry(camera_matrix, ground_truth_poses)
+    model = VisualSLAM(camera_matrix, ground_truth_poses)
     
     # Initialise an empty drawing board for trajectory
     blank_slate = np.zeros((600,600,3), dtype=np.uint8)
     
     # Iterate over the frames and update the rotation and translation vectors
     for index in range(num_frames):
+
         frame, _ = dataset[index]
-        updated_t = model(index, frame)
+        model(index, frame)
+        
         if index>2:
-            x, y, z = updated_t[0], updated_t[1], updated_t[2]
+            x, y, z = model.cur_t[0], model.cur_t[1], model.cur_t[2]
         else:
             x, y, z = 0.,  0., 0.
             
