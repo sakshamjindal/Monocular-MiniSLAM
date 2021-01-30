@@ -23,9 +23,9 @@ docker build -t env_g2o_pangolin:latest .
 **Step 3. Mount the local directory and forward GUI components from inside the container**
 ```
 xhost +local:docker
-docker run -dit -P --name slam_box --net=host -e DISPLAY -v /tmp/.X11-unix -v ~/mono-slam:/home/slam env_g2o_pangolin:latest
+docker run -dit -P --name slam_box --net=host -e DISPLAY -v /tmp/.X11-unix -v ~/mono-slam:/home/slam -v ~/KITTI:/home/KITTI env_g2o_pangolin:latest
 docker exec -it slam_box bash
 ```
-You will be able to see your working directory `~/mono-slam` inside `/home/` directory
+You will be able to see your working directory `~/mono-slam` and `~/KITTI` inside `/home/` directory
 
 Some links that were helpful in step 3 were a [youtube video](https://www.youtube.com/watch?v=RDg6TRwiPtg&t=37s&ab_channel=PiotrekChmielowski)
