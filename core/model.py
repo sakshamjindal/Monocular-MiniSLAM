@@ -24,7 +24,7 @@ class VisualSLAM():
         self.trueX, self.trueY, self.trueZ = 0, 0, 0
         self.poses = []
         self.gt = []
-
+        self.errors = []
         self.pose_graph = PoseGraph(verbose = True)
 
         
@@ -61,12 +61,31 @@ class VisualSLAM():
         Calculate errors propagated
         """
 
-        error_r, error_t = getError(self.poses[-1], self.poses[-2], self.gt[-1], self.gt[-2])
+        error_r , error_t = getError(self.poses[-1], self.poses[-2], self.gt[-1], self.gt[-2])
         self.errors.append((error_r, error_t))
+
+    def annotate_frames(self):
+
+        """
+            a is current frame
+            b is prev frame
+        """
+
+        a = self.current_frame
+        b = self.prev_frame
+        out = np.copy(a)
+        old_coords = b.coords
+
+        [cv2.line(out, tuple(np.int0(a.coords[i_a])), tuple(np.int0(b.coords[i_b])), (255, 0, 255), 2) for i_a, i_b in a.des_idxs]
+
+        [cv2.circle(out, tuple(np.int0(a.coords[i_a])), 4,(0,255,0), 2) for i_a, i_b in a.des_idxs]
+
+        return out
 
     def __call__(self, stage, current_frame):
         
-        self.gt.append(self.ground_pose[stage-1])
+        self.gt.append(convert_to_4_by_4(self.ground_pose[stage-1]))
+        self.current_frame = current_frame
 
         if stage == 0:
             """ process first frame """
@@ -108,9 +127,10 @@ class VisualSLAM():
                 self.run_optimizer()
                 #self.calculate_errors()
 
-        self.poses.append(self.cur_Rt)
+        self.poses.append(convert_to_4_by_4(self.cur_Rt))
 
         self.prev_t = self.cur_t
         self.prev_R = self.cur_R
         self.prev_Rt = convert_to_Rt(self.prev_R, self.prev_t)        
         self.prev_frame = current_frame
+        

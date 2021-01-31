@@ -10,5 +10,5 @@ where `path` is the path to the KITTI dataset (directory structure of code and d
 - [x] Build visual-odometry frontend with ORB descriptors and 2D-2D feature correspondences 
 - [x] Build G2O and Pangolin (check [Installation.md](Installation/Installation.md)) on few tips on installation and troubleshooting guide 
 - [x] Check working of front end of the slam system
-- [ ] Integrate real-time pose-graph optimization backend using g2o
+- [ ] Integrate pose-graph optimization backend using g2o
 - [ ] Set up 3D plotter for visualisation of frames and point cloud

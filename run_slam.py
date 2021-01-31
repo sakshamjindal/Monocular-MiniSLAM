@@ -5,6 +5,8 @@ import argparse
 from core.model import VisualSLAM
 from core.dataset import KittiDataset
 from core.utils import draw_trajectory
+from core.display2D import Displayer
+from core.display3D import Viewer3D
 
 def parse_argument():
     
@@ -12,7 +14,6 @@ def parse_argument():
     parser.add_argument('--dataset', default='kitti')
     parser.add_argument('--path', required=True)
     return parser.parse_args()
-
 
 def main():
     
@@ -27,15 +28,19 @@ def main():
     # Initialise the mono-VO model
     model = VisualSLAM(camera_matrix, ground_truth_poses)
     
-    # Initialise an empty drawing board for trajectory
-    blank_slate = np.zeros((600,600,3), dtype=np.uint8)
+    # Initialie the viewer object
+    viewer = Viewer3D()
+    error = []
     
     # Iterate over the frames and update the rotation and translation vectors
     for index in range(num_frames):
 
         frame, _ , _ = dataset[index]
         model(index, frame)
-        
+
+        if index>2:
+            viewer.update(model)
+
         if index>2:
             x, y, z = model.cur_t[0], model.cur_t[1], model.cur_t[2]
         else:
@@ -46,14 +51,13 @@ def main():
         draw_x, draw_y =int(x) + 290 - offset_x, int(z) + 290 - offset_y
         true_x, true_y = int(model.trueX) + 290, int(model.trueZ) + 290
         
-        draw_trajectory(blank_slate, index, x, y, z, draw_x, draw_y, true_x, true_y)
+        #draw_trajectory(blank_slate, index, x, y, z, draw_x, draw_y, true_x, true_y)
         cv2.imshow('Road facing camera', frame)
         cv2.waitKey(1)
-
-        if index>10:
-            break
-    
+  
     model.pose_graph.optimize(100)
+    viewer.update(model)
+    viewer.stop()
 
 if __name__ == "__main__":
     main()

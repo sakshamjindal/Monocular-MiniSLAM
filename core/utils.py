@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+from scipy.spatial.transform import Rotation as R
+
 
 def draw_trajectory(traj, frame_id, x, y, z, draw_x, draw_y, true_x, true_y):
     
@@ -18,6 +20,27 @@ def convert_to_Rt(R,t):
     """
 
     return np.hstack((R, t.reshape(-1,1)))
+
+def rotation_to_quaternions(rotation: np.ndarray):
+
+    """
+    convert rotation matrix to quaternions vector
+    """
+
+    assert rotation.shape ==  (3,3)
+
+    return R.from_matrix(rotation).as_quat()
+
+def convert_to_4_by_4(Rt):
+
+    try:
+        assert Rt.shape==(3,4)
+    except:
+        print(Rt.shape)
+        raise AssertionError("Input Matrix form should be of 3x4")
+
+    return np.vstack((Rt, np.array([0,0,0,1])))
+
 
 def getTransform(cur_pose, prev_pose):
 
@@ -39,12 +62,12 @@ def getError(cur_pose, prev_pose, cur_gt, prev_gt):
     
     error_t = np.linalg.norm((prev_pose[:3, -1] - cur_pose[:3,-1]) - (cur_gt[:3,-1] - prev_gt[:3,-1]))
 
-    gt_prev_qt = quaternion.from_rotation_matrix(prev_gt[:3, :3])
-    gt_qt = quaternion.from_rotation_matrix(cur_gt[:3, :3])
+    gt_prev_qt = rotation_to_quaternions(prev_gt[:3, :3])
+    gt_qt = rotation_to_quaternions(cur_gt[:3, :3])
     gt_tform = gt_prev_qt * gt_qt.inverse()
 
-    cur_qt = quaternion.from_rotation_matrix(prev_pose[:3, :3])
-    prev_qt = quaternion.from_rotation_matrix(cur_pose[:3, :3])
+    cur_qt = rotation_to_quaternions(prev_pose[:3, :3])
+    prev_qt = rotation_to_quaternions(cur_pose[:3, :3])
 
     qt_tform = prev_qt * cur_qt.inverse()
 
