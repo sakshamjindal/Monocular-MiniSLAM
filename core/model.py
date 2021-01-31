@@ -54,6 +54,8 @@ class VisualSLAM():
         self.pose_graph.add_vertex(len(self.poses), self.cur_Rt)
         self.pose_graph.add_edge((len(self.poses)-1, len(self.poses)), getTransform(self.cur_Rt, self.prev_Rt))
 
+        
+
 
     def calculate_errors(self):
 
