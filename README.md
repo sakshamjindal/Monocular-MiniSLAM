@@ -12,4 +12,5 @@ where `path` is the path to the KITTI dataset (directory structure of code and d
 - [x] Check working of front end of the slam system
 - [x] Integrate pose-graph optimization backend using g2o (static)
 - [x] Set up 3D plotter for visualisation of frames and point cloud
-- [ ] Integrate pose-graph optimization backend on-the-fly (dyanamic)
+- [x] Integrate pose-graph optimization backend on-the-fly (dyanamic)
+- [x] Intergrated bundled pose graph optimization (backend)

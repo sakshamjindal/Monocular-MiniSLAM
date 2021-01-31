@@ -8,7 +8,7 @@ from .utils import *
 import pdb
 
 KMIN_NUM_FEATURE = 1500
-optimize = True
+optimize = False
 
 class VisualSLAM():
    
@@ -43,20 +43,24 @@ class VisualSLAM():
         return np.sqrt((x - x_prev)*(x - x_prev) + (y - y_prev)*(y - y_prev) + (z - z_prev)*(z - z_prev))
         
 
-    def run_optimizer(self, local_window=1):
+    def run_optimizer(self, local_window=10):
 
         """
         Add poses to the optimizer graph
         """
+        if len(self.poses)<local_window+1:
+            return
 
         self.pose_graph = PoseGraph(verbose = True)
+        local_poses = self.poses[1:][-local_window:]
 
-        for i in range(len(self.poses)):   
-            self.pose_graph.add_vertex(i, self.poses[i])
-            self.pose_graph.add_edge((i-1, i), getTransform(self.poses[i], self.poses[i-1]))
-            self.pose_graph.optimize()
+        for i in range(1,len(local_poses)):   
+            self.pose_graph.add_vertex(i, local_poses[i])
+            self.pose_graph.add_edge((i-1, i), getTransform(local_poses[i], local_poses[i-1]))
+            self.pose_graph.optimize(100)
         
-        self.poses[1:] = self.pose_graph.nodes_optimized
+        self.poses[-local_window+1:] = self.pose_graph.nodes_optimized
+
 
     def calculate_errors(self):
 

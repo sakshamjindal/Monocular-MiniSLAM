@@ -55,6 +55,7 @@ def main():
         cv2.imshow('Road facing camera', frame)
         cv2.waitKey(1)
 
+
     viewer.update(model)
     viewer.stop()
 
