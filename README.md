@@ -1,7 +1,13 @@
 # Monocular-Visual-SLAM
+
+
 To run the visual Odometry:
+
 ```
-python run_VO.py --path ../KITTI/KITTI_gray/dataset/sequences/00
+python run_slam.py --path ../KITTI/KITTI_gray/dataset/sequences/00 \
+                   --optimize \
+                   --local_window 10 \
+                   --num_iter 100
 ```
 where `path` is the path to the KITTI dataset (directory structure of code and data to be updated)
 

@@ -12,10 +12,11 @@ optimize = False
 
 class VisualSLAM():
    
-    def __init__(self, camera_intrinsics, ground_pose):
+    def __init__(self, camera_intrinsics, ground_pose, args):
         
         self.K = camera_intrinsics
         self.ground_pose = ground_pose
+        self.args = args
         self.feature_tracker = featureTracking
         self.detector = cv2.FastFeatureDetector_create(threshold=25, nonmaxSuppression=True)
         self.cur_R = None
@@ -57,7 +58,7 @@ class VisualSLAM():
         for i in range(1,len(local_poses)):   
             self.pose_graph.add_vertex(i, local_poses[i])
             self.pose_graph.add_edge((i-1, i), getTransform(local_poses[i], local_poses[i-1]))
-            self.pose_graph.optimize(100)
+            self.pose_graph.optimize(self.args.num_iter)
         
         self.poses[-local_window+1:] = self.pose_graph.nodes_optimized
 
@@ -71,23 +72,6 @@ class VisualSLAM():
         error_r , error_t = getError(self.poses[-1], self.poses[-2], self.gt[-1], self.gt[-2])
         self.errors.append((error_r, error_t))
 
-    def annotate_frames(self):
-
-        """
-            a is current frame
-            b is prev frame
-        """
-
-        a = self.current_frame
-        b = self.prev_frame
-        out = np.copy(a)
-        old_coords = b.coords
-
-        [cv2.line(out, tuple(np.int0(a.coords[i_a])), tuple(np.int0(b.coords[i_b])), (255, 0, 255), 2) for i_a, i_b in a.des_idxs]
-
-        [cv2.circle(out, tuple(np.int0(a.coords[i_a])), 4,(0,255,0), 2) for i_a, i_b in a.des_idxs]
-
-        return out
 
     def __call__(self, stage, current_frame):
         
@@ -132,8 +116,8 @@ class VisualSLAM():
             self.cur_Rt = convert_to_Rt(self.cur_R, self.cur_t)
             self.poses.append(convert_to_4_by_4(self.cur_Rt))
 
-            if optimize:
-                self.run_optimizer()
+            if self.args.optimize:
+                self.run_optimizer(self.args.local_window)
                 #self.calculate_errors()
 
         self.prev_t = self.cur_t
