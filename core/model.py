@@ -25,8 +25,6 @@ class VisualSLAM():
         self.poses = []
         self.gt = []
         self.errors = []
-        self.pose_graph = PoseGraph(verbose = True)
-
         
     def getAbsoluteScale(self, frame_id):
         """
@@ -45,17 +43,20 @@ class VisualSLAM():
         return np.sqrt((x - x_prev)*(x - x_prev) + (y - y_prev)*(y - y_prev) + (z - z_prev)*(z - z_prev))
         
 
-    def run_optimizer(self):
+    def run_optimizer(self, local_window=1):
 
         """
         Add poses to the optimizer graph
         """
-        
-        self.pose_graph.add_vertex(len(self.poses), self.cur_Rt)
-        self.pose_graph.add_edge((len(self.poses)-1, len(self.poses)), getTransform(self.cur_Rt, self.prev_Rt))
 
-        
+        self.pose_graph = PoseGraph(verbose = True)
 
+        for i in range(len(self.poses)):   
+            self.pose_graph.add_vertex(i, self.poses[i])
+            self.pose_graph.add_edge((i-1, i), getTransform(self.poses[i], self.poses[i-1]))
+            self.pose_graph.optimize()
+        
+        self.poses[1:] = self.pose_graph.nodes_optimized
 
     def calculate_errors(self):
 
@@ -107,6 +108,7 @@ class VisualSLAM():
             _, self.cur_R, self.cur_t, __ = cv2.recoverPose(E, points_cur, self.points_ref, self.K)
             self.points_ref = points_cur
             self.cur_Rt = convert_to_Rt(self.cur_R, self.cur_t)
+            self.poses.append(convert_to_4_by_4(self.cur_Rt))
         else:
             """ process subsequent frames after first 2 frames """
             
@@ -124,12 +126,11 @@ class VisualSLAM():
             self.points_ref = points_cur
         
             self.cur_Rt = convert_to_Rt(self.cur_R, self.cur_t)
+            self.poses.append(convert_to_4_by_4(self.cur_Rt))
 
             if optimize:
                 self.run_optimizer()
                 #self.calculate_errors()
-
-        self.poses.append(convert_to_4_by_4(self.cur_Rt))
 
         self.prev_t = self.cur_t
         self.prev_R = self.cur_R

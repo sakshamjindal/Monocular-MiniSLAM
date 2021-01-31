@@ -1,5 +1,6 @@
 import g2o
 import numpy as np
+import pdb
 
 class PoseGraph(object):
   nodes = []
@@ -8,6 +9,10 @@ class PoseGraph(object):
   edges_optimized = []
 
   def __init__(self, verbose=False):
+
+    """
+    Initialise the pose graph optimizer (G2O)
+    """
     self.solver = g2o.BlockSolverSE3(g2o.LinearSolverEigenSE3())
     self.solver=  g2o.OptimizationAlgorithmLevenberg(self.solver)
 
@@ -16,6 +21,7 @@ class PoseGraph(object):
     self.optimizer.set_algorithm(self.solver)
 
   def add_vertex(self, id, pose, is_fixed=False):
+    
     # Rt (pose) matrix, absolute
     v = g2o.VertexSE3()
     v.set_id(id)
@@ -26,9 +32,9 @@ class PoseGraph(object):
     self.nodes.append(v)
 
   def add_edge(self, vertices, measurement=None, information=np.eye(6), robust_kernel=None):
+    
     edge = g2o.EdgeSE3()
     for i, vertex in enumerate(vertices):
-    
     # check to see if we're passing in actual vertices or just the vertex ids
     
       if isinstance(vertex, int): 
@@ -57,6 +63,6 @@ class PoseGraph(object):
     if False:
       for edge in self.optimizer.edges():
         self.edges_optimized = [(edge.vertices()[0].estimate().matrix(), edge.vertices()[1].estimate().matrix())for edge in self.optimizer.edges()]
-    self.nodes_optimized = np.array([i.estimate().matrix() for i in self.optimizer.vertices().values()])
-    self.nodes_optimized = np.array(self.nodes_optimized)
+    self.nodes_optimized = [i.estimate().matrix() for i in self.optimizer.vertices().values()]
+    #self.nodes_optimized = (self.nodes_optimized)
     self.edges_optimized = np.array(self.edges_optimized)
