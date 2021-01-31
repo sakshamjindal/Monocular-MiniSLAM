@@ -1,7 +1,8 @@
 # Monocular-Visual-SLAM
 
+Minimal implementation of monocular SLAM with pose graph optimisation (loop closing yet to be implemented)
 
-To run the visual Odometry:
+To run the visual SLAM:
 
 ```
 python run_slam.py --path ../KITTI/KITTI_gray/dataset/sequences/00 \
